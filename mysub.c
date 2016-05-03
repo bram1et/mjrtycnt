@@ -72,7 +72,9 @@ int mysub( int n ) {
 	int return_index = 0, qcount_result, issame_result, test_ind, two_pointer = 0, four_pointer = 0, two_majority = 0, four_majority = 0;
 	int i;
 	int results_pointer = 0;
-	for (i = 1; i < n; i+= 4)
+	int leftover = n % 4;
+	printf("leftover: %d\n", leftover);
+	for (i = 1; i < n - leftover; i+= 4)
 	{
 		myarray[0] = i;
 		myarray[1] = i + 1;
@@ -98,8 +100,8 @@ int mysub( int n ) {
 	// 	printf("%d ",qcount_results[i]);
 	// }
 	// printf("\n");
-	// printf("two_majority:  %d\n", two_majority);
-	// printf("four_majority: %d\n", four_majority);
+	printf("two_majority:  %d\n", two_majority);
+	printf("four_majority: %d\n", four_majority);
 	// printf("\n");
 
 	int two_index_start = two_index[two_pointer - 1];
@@ -116,7 +118,106 @@ int mysub( int n ) {
 			//return index from greater majority
 
 			int difference = (4 * four_majority) - (2 * two_majority);
-			if (difference > 0) {
+			
+			printf("difference %d\n", difference);
+
+			if (difference == 2 && leftover == 2) {
+
+				int remain_1 = n - leftover + 1;
+				int remain_2 = n - leftover + 2;
+
+				myarray[0] = remain_1;
+				myarray[1] = remain_2;
+				myarray[2] = four_indexes[0];
+				myarray[3] = four_indexes[1];
+
+				if (QCOUNT(1, myarray) == 0) {
+					return_index = 0;
+				} else {
+					return_index = four_index_start;
+				}
+
+			} else if (difference == -2 && leftover == 2) {
+
+				int remain_1 = n - leftover + 1;
+				int remain_2 = n - leftover + 2;
+
+				myarray[0] = remain_1;
+				myarray[1] = remain_2;
+				myarray[2] = four_indexes[0];
+				myarray[3] = four_indexes[1];
+
+				if (QCOUNT(1, myarray) == 4) {
+					return_index = 0;
+				} else {
+					four_indexes[0] = remain_1;
+					if (QCOUNT(1, four_indexes) == 2) {
+						return_index = remain_1;
+					} else {
+						return_index = remain_2;
+					}
+				}
+
+			} else if (difference == 2 && leftover == 3) {
+
+				int remain_1 = n - leftover + 1;
+				int remain_2 = n - leftover + 2;
+				int remain_3 = n - leftover + 3;
+
+				myarray[0] = remain_1;
+				int qcount_1 = QCOUNT(1, myarray);
+				myarray[0] = remain_2;
+				int qcount_2 = QCOUNT(1, myarray);
+				myarray[0] = remain_3;
+				int qcount_3 = QCOUNT(1, myarray);
+
+				if (qcount_1 == qcount_2 && qcount_2 == qcount_3) {
+					return_index = n;
+				} else {
+					return_index = four_index_start;	
+				}
+
+			} else if (difference == -2 && leftover == 3) {
+
+				int remain_1 = n - leftover + 1;
+				int remain_2 = n - leftover + 2;
+				int remain_3 = n - leftover + 3;
+
+				myarray[0] = remain_1;
+				int qcount_1 = QCOUNT(1, myarray);
+				myarray[0] = remain_2;
+				int qcount_2 = QCOUNT(1, myarray);
+				myarray[0] = remain_3;
+				int qcount_3 = QCOUNT(1, myarray);
+
+				if (qcount_1 == qcount_2 && qcount_2 == qcount_3) {
+					return_index = n;
+				} else {
+					if (two_index_start == 1) {
+					test_ind = n;
+					} else {
+						test_ind = 1;
+					}
+
+					two_indexes[0] = test_ind;
+					qcount_result = QCOUNT(1, two_indexes);
+					if (qcount_result == 0) {
+						return_index = two_index_start;
+					} else if (qcount_result == 4) {
+						return_index = test_ind;
+					} else if (qcount_result == 2) {
+						two_indexes[0] = two_index_start;
+						two_indexes[1] = test_ind;
+						qcount_result = QCOUNT(1, two_indexes);
+						if (qcount_result == 0) {
+							return_index = two_index_start + 1;
+						} else {
+							return_index = two_index_start;
+						}
+					}	
+				}
+
+			} else if (difference > 0) {
 				return_index = four_index_start;
 			} else if (difference < 0) {
 				// get majority index from 2_majority
@@ -145,38 +246,231 @@ int mysub( int n ) {
 					}
 				}
 			} else {
-				return_index = 0;
+
+				if (leftover == 1) {
+
+					return_index = n;
+
+				} else if (leftover == 2) {
+					// see if same
+					// if same, refturn 1
+					// else return 0
+
+					int remain_1 = n - leftover + 1;
+					int remain_2 = n - leftover + 2;
+
+					myarray[0] = remain_1;
+					int qcount_1 = QCOUNT(1, myarray);
+					myarray[0] = remain_2;
+					int qcount_2 = QCOUNT(1, myarray);
+
+					if (qcount_1 == qcount_2) {
+						return_index = n;
+					} else {
+						return_index = 0;
+					}
+
+				} else if (leftover == 3) {
+
+					int remain_1 = n - leftover + 1;
+					int remain_2 = n - leftover + 2;
+					int remain_3 = n - leftover + 3;
+
+					myarray[0] = remain_1;
+					int qcount_1 = QCOUNT(1, myarray);
+					myarray[0] = remain_2;
+					int qcount_2 = QCOUNT(1, myarray);
+					myarray[0] = remain_3;
+					int qcount_3 = QCOUNT(1, myarray);
+
+					if (qcount_1 == qcount_2) {
+						return_index = remain_1;
+					} else if (qcount_1 == qcount_3) {
+						return_index = remain_1;
+					} else {
+						return_index = remain_2;
+					}
+
+
+				} else {
+					return_index = 0;	
+				}
 			}
 		}
 	} else if (two_majority > 0 && four_majority == 0) {
 		// Still need to account for remainder if input not multiple of 4
-		if (two_index_start == 1) {
-			test_ind = n;
-		} else {
-			test_ind = 1;
-		}
 
-		two_indexes[0] = test_ind;
-		qcount_result = QCOUNT(1, two_indexes);
-		if (qcount_result == 0) {
-			return_index = two_index_start;
-		} else if (qcount_result == 4) {
-			return_index = test_ind;
-		} else if (qcount_result == 2) {
-			two_indexes[0] = two_index_start;
-			two_indexes[1] = test_ind;
+		if (two_majority > 1 || leftover <= 1) {
+		
+			if (two_index_start == 1) {
+				test_ind = n;
+			} else {
+				test_ind = 1;
+			}
+
+			two_indexes[0] = test_ind;
 			qcount_result = QCOUNT(1, two_indexes);
 			if (qcount_result == 0) {
-				return_index = two_index_start + 1;
-			} else {
 				return_index = two_index_start;
+			} else if (qcount_result == 4) {
+				return_index = test_ind;
+			} else if (qcount_result == 2) {
+				two_indexes[0] = two_index_start;
+				two_indexes[1] = test_ind;
+				qcount_result = QCOUNT(1, two_indexes);
+				if (qcount_result == 0) {
+					return_index = two_index_start + 1;
+				} else {
+					return_index = two_index_start;
+				}
 			}
+
+		} else {
+
+			if (leftover == 2) {
+				int remain_1 = n - leftover + 1;
+				int remain_2 = n - leftover + 2;
+
+				myarray[0] = remain_1;
+				int qcount_1 = QCOUNT(1, myarray);
+				myarray[0] = remain_2;
+				int qcount_2 = QCOUNT(1, myarray);
+
+				if (qcount_1 == qcount_2) {
+					//check if same majority as two majority
+					int myarray1[4], myarray2[4];
+					myarray1[0] = remain_1;
+					myarray1[1] = remain_2;
+					myarray1[2] = two_indexes[0];
+					myarray1[3] = two_indexes[1];
+
+					myarray2[0] = remain_1;
+					myarray2[1] = remain_2;
+					myarray2[2] = two_indexes[2];
+					myarray2[3] = two_indexes[3];
+
+					if (QCOUNT(1, myarray1) == 4 || QCOUNT(1, myarray2) == 4) {
+						return_index = n;
+					} else {
+						return_index = 0;
+					}
+				} else {
+					if (two_index_start == 1) {
+						test_ind = n;
+					} else {
+						test_ind = 1;
+					}
+
+					two_indexes[0] = test_ind;
+					qcount_result = QCOUNT(1, two_indexes);
+					if (qcount_result == 0) {
+						return_index = two_index_start;
+					} else if (qcount_result == 4) {
+						return_index = test_ind;
+					} else if (qcount_result == 2) {
+						two_indexes[0] = two_index_start;
+						two_indexes[1] = test_ind;
+						qcount_result = QCOUNT(1, two_indexes);
+						if (qcount_result == 0) {
+							return_index = two_index_start + 1;
+						} else {
+							return_index = two_index_start;
+						}
+					}
+				}
+
+			} else if (leftover == 3) {
+				int remain_1 = n - leftover + 1;
+				int remain_2 = n - leftover + 2;
+				int remain_3 = n - leftover + 3;
+
+				myarray[0] = remain_1;
+				int qcount_1 = QCOUNT(1, myarray);
+				myarray[0] = remain_2;
+				int qcount_2 = QCOUNT(1, myarray);
+				myarray[0] = remain_3;
+				int qcount_3 = QCOUNT(1, myarray);
+
+				if (qcount_1 == qcount_2 && qcount_2 == qcount_3) {
+					return_index = n;
+				} else {
+					if (two_index_start == 1) {
+						test_ind = n;
+					} else {
+						test_ind = 1;
+					}
+
+					two_indexes[0] = test_ind;
+					qcount_result = QCOUNT(1, two_indexes);
+					if (qcount_result == 0) {
+						return_index = two_index_start;
+					} else if (qcount_result == 4) {
+						return_index = test_ind;
+					} else if (qcount_result == 2) {
+						two_indexes[0] = two_index_start;
+						two_indexes[1] = test_ind;
+						qcount_result = QCOUNT(1, two_indexes);
+						if (qcount_result == 0) {
+							return_index = two_index_start + 1;
+						} else {
+							return_index = two_index_start;
+						}
+					}
+				}
+			}
+
 		}
 	} else if (two_majority == 0 && four_majority > 0) {
 		return_index = four_index[four_pointer - 1];
 	} else if (two_majority == 0 && four_majority == 0) {
 		// Still need to account for remainder if input not multiple of 4
-		return_index = 0;
+		if (leftover == 1) {
+			return_index = n;
+		} else if (leftover == 2) {
+			// see if same
+			// if same, refturn 1
+			// else return 0
+
+			int remain_1 = n - leftover + 1;
+			int remain_2 = n - leftover + 2;
+
+			myarray[0] = remain_1;
+			int qcount_1 = QCOUNT(1, myarray);
+			myarray[0] = remain_2;
+			int qcount_2 = QCOUNT(1, myarray);
+
+			if (qcount_1 == qcount_2) {
+				return_index = n;
+			} else {
+				return_index = 0;
+			}
+		} else if (leftover == 3) {
+
+
+			int remain_1 = n - leftover + 1;
+			int remain_2 = n - leftover + 2;
+			int remain_3 = n - leftover + 3;
+
+			myarray[0] = remain_1;
+			int qcount_1 = QCOUNT(1, myarray);
+			myarray[0] = remain_2;
+			int qcount_2 = QCOUNT(1, myarray);
+			myarray[0] = remain_3;
+			int qcount_3 = QCOUNT(1, myarray);
+
+			if (qcount_1 == qcount_2) {
+				return_index = remain_1;
+			} else if (qcount_1 == qcount_3) {
+				return_index = remain_1;
+			} else {
+				return_index = remain_2;
+			}
+
+
+		} else {
+			return_index = 0;	
+		}
+		
 	}
 	// printf("%d\n", return_index);
 	return return_index;
